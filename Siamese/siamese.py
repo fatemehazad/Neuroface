@@ -289,8 +289,8 @@ siamese_model.save('siamesemodel_v1.h5')
 
 
 test_data = test_data.batch(16).prefetch(tf.data.AUTOTUNE)
-test_data_men = test_data_men.batch(16).prefetch(tf.data.AUTOTUNE
-test_data_women = test_data_men.batch(16).prefetch(tf.data.AUTOTUNE)
+test_data_men = test_data_men.batch(16).prefetch(tf.data.AUTOTUNE)
+test_data_women = test_data_women.batch(16).prefetch(tf.data.AUTOTUNE)
 
 
 # In[ ]:
