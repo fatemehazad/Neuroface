@@ -316,7 +316,7 @@ def test(data, gender):
     p = Precision()
     a = BinaryAccuracy()
     for x_left, x_right, y_true in data.as_numpy_iterator():
-        yhat = siamese_model.predict([x_left, x_right], verbos=0)
+        yhat = siamese_model.predict([x_left, x_right], verbose=0)
         r.update_state(y_true, yhat)
         p.update_state(y_true, yhat)
         a.update_state(y_true, yhat)
