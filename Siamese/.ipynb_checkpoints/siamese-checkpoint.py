@@ -81,7 +81,7 @@ def preprocess_data(file_path):
 # In[ ]:
 
 
-train_data = preprocess_data('pairs/train_pairs_mixed.pkl')
+# train_data = preprocess_data('pairs/train_pairs_mixed.pkl')
 
 
 # In[ ]:
@@ -97,7 +97,7 @@ train_data = preprocess_data('pairs/train_pairs_mixed.pkl')
 # In[ ]:
 
 
-validation_data = preprocess_data('pairs/validation_pairs_mixed.pkl')
+# validation_data = preprocess_data('pairs/validation_pairs_mixed.pkl')
 
 
 # In[ ]:
@@ -180,112 +180,112 @@ siamese_model = make_siamese_model()
 # In[ ]:
 
 
-train_data = train_data.batch(16).prefetch(tf.data.AUTOTUNE)
-validation_data = validation_data.batch(16).prefetch(tf.data.AUTOTUNE)
+# train_data = train_data.batch(16).prefetch(tf.data.AUTOTUNE)
+# validation_data = validation_data.batch(16).prefetch(tf.data.AUTOTUNE)
 
 
-# In[ ]:
+# # In[ ]:
 
 
-binary_cross_loss = tf.losses.BinaryCrossentropy()
-opt = tf.keras.optimizers.Adam(1e-4) # 0.0001
+# binary_cross_loss = tf.losses.BinaryCrossentropy()
+# opt = tf.keras.optimizers.Adam(1e-4) # 0.0001
 
 
-# In[ ]:
+# # In[ ]:
 
 
-checkpoint_dir = 'training_checkpoints'
-checkpoint_prefix = os.path.join(checkpoint_dir, 'ckpt')
-checkpoint = tf.train.Checkpoint(opt=opt, siamese_model=siamese_model)
+# checkpoint_dir = 'training_checkpoints'
+# checkpoint_prefix = os.path.join(checkpoint_dir, 'ckpt')
+# checkpoint = tf.train.Checkpoint(opt=opt, siamese_model=siamese_model)
 
 
-# In[ ]:
+# # In[ ]:
 
 
-with open('training_results.csv', mode='w', newline='') as file:
-    writer = csv.writer(file)      
-    writer.writerow(['Epoch', 'Train Recall', 'Train Precision', 'Train Accuracy', 'Validation Recall', 'Validation Precision', 'Validation Accuracy'])
+# with open('training_results.csv', mode='w', newline='') as file:
+#     writer = csv.writer(file)      
+#     writer.writerow(['Epoch', 'Train Recall', 'Train Precision', 'Train Accuracy', 'Validation Recall', 'Validation Precision', 'Validation Accuracy'])
 
 
-# In[ ]:
+# # In[ ]:
 
 
-@tf.function
-def train_step(batch):
-    with tf.GradientTape() as tape:     
-        X = batch[:2]
-        y = batch[2] 
-        yhat = siamese_model(X, training=True)
-        loss = binary_cross_loss(y, yhat)
-    grad = tape.gradient(loss, siamese_model.trainable_variables)
-    opt.apply_gradients(zip(grad, siamese_model.trainable_variables))
-    return loss
+# @tf.function
+# def train_step(batch):
+#     with tf.GradientTape() as tape:     
+#         X = batch[:2]
+#         y = batch[2] 
+#         yhat = siamese_model(X, training=True)
+#         loss = binary_cross_loss(y, yhat)
+#     grad = tape.gradient(loss, siamese_model.trainable_variables)
+#     opt.apply_gradients(zip(grad, siamese_model.trainable_variables))
+#     return loss
 
 
-# In[ ]:
+# # In[ ]:
 
 
-def validate(data):
-    r = Recall()
-    p = Precision()
-    a = BinaryAccuracy()
-    progbar = tf.keras.utils.Progbar(len(data), unit_name='batch')
-    for idx, batch in enumerate(data):
-        yhat = siamese_model.predict(batch[:2], verbose=0)
-        r.update_state(batch[2], yhat)
-        p.update_state(batch[2], yhat)
-        a.update_state(batch[2], yhat)
-        progbar.update(idx + 1)
-    return r.result().numpy(), p.result().numpy(), a.result().numpy()
+# def validate(data):
+#     r = Recall()
+#     p = Precision()
+#     a = BinaryAccuracy()
+#     progbar = tf.keras.utils.Progbar(len(data), unit_name='batch')
+#     for idx, batch in enumerate(data):
+#         yhat = siamese_model.predict(batch[:2], verbose=0)
+#         r.update_state(batch[2], yhat)
+#         p.update_state(batch[2], yhat)
+#         a.update_state(batch[2], yhat)
+#         progbar.update(idx + 1)
+#     return r.result().numpy(), p.result().numpy(), a.result().numpy()
 
 
-# In[ ]:
+# # In[ ]:
 
 
-def train(train_data, validation_data, EPOCHS):
-    for epoch in range(1, EPOCHS + 1):
-        print('\n Epoch {}/{}'.format(epoch, EPOCHS))
-        progbar = tf.keras.utils.Progbar(len(train_data), unit_name='batch')
-        r = Recall()
-        p = Precision()
-        a = BinaryAccuracy()
-        for idx, batch in enumerate(train_data):
-            loss = train_step(batch)
-            yhat = siamese_model.predict(batch[:2], verbose=0)
-            r.update_state(batch[2], yhat)
-            p.update_state(batch[2], yhat)
-            a.update_state(batch[2], yhat)
-            progbar.update(idx + 1)
-        train_recall = r.result().numpy()
-        train_precision = p.result().numpy()
-        train_accuracy = a.result().numpy()
-        print(f'[Train Results] recall: {train_recall} precision: {train_precision} accuracy: {train_accuracy}')
+# def train(train_data, validation_data, EPOCHS):
+#     for epoch in range(1, EPOCHS + 1):
+#         print('\n Epoch {}/{}'.format(epoch, EPOCHS))
+#         progbar = tf.keras.utils.Progbar(len(train_data), unit_name='batch')
+#         r = Recall()
+#         p = Precision()
+#         a = BinaryAccuracy()
+#         for idx, batch in enumerate(train_data):
+#             loss = train_step(batch)
+#             yhat = siamese_model.predict(batch[:2], verbose=0)
+#             r.update_state(batch[2], yhat)
+#             p.update_state(batch[2], yhat)
+#             a.update_state(batch[2], yhat)
+#             progbar.update(idx + 1)
+#         train_recall = r.result().numpy()
+#         train_precision = p.result().numpy()
+#         train_accuracy = a.result().numpy()
+#         print(f'[Train Results] recall: {train_recall} precision: {train_precision} accuracy: {train_accuracy}')
         
-        val_recall, val_precision, val_accuracy = validate(validation_data)
-        print(f'[Validation Results] recall: {val_recall} precision: {val_precision} accuracy: {val_accuracy}')
+#         val_recall, val_precision, val_accuracy = validate(validation_data)
+#         print(f'[Validation Results] recall: {val_recall} precision: {val_precision} accuracy: {val_accuracy}')
         
-        with open('training_results.csv', mode='a', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow([epoch, train_recall, train_precision, train_accuracy, val_recall, val_precision, val_accuracy])
-        if epoch % 5 == 0:
-            checkpoint.save(file_prefix=checkpoint_prefix)
+#         with open('training_results.csv', mode='a', newline='') as file:
+#             writer = csv.writer(file)
+#             writer.writerow([epoch, train_recall, train_precision, train_accuracy, val_recall, val_precision, val_accuracy])
+#         if epoch % 5 == 0:
+#             checkpoint.save(file_prefix=checkpoint_prefix)
 
 
-# In[ ]:
+# # In[ ]:
 
 
-train(train_data, validation_data, EPOCHS=80)
+# train(train_data, validation_data, EPOCHS=80)
 
 
-# In[ ]:
+# # In[ ]:
 
 
-siamese_model.save('siamesemodel_v1.h5')
+# siamese_model.save('siamesemodel_v1.h5')
 
 
-# # Test
+# # # Test
 
-# In[ ]:
+# # In[ ]:
 
 
 test_data = test_data.batch(16).prefetch(tf.data.AUTOTUNE)
@@ -316,7 +316,7 @@ def test(data, gender):
     p = Precision()
     a = BinaryAccuracy()
     for x_left, x_right, y_true in data.as_numpy_iterator():
-        yhat = siamese_model.predict([x_left, x_right], verbos=0)
+        yhat = siamese_model.predict([x_left, x_right], verbose=0)
         r.update_state(y_true, yhat)
         p.update_state(y_true, yhat)
         a.update_state(y_true, yhat)
